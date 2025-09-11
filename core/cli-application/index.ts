@@ -1,5 +1,5 @@
 import { match } from "ts-pattern";
-import type { TE2EAutogenConfig } from "../../config";
+import { ConfigInitializer, type TE2EAutogenConfig } from "../../config";
 import { authorizedGoogleSpreadsheets } from "../google-spreadsheets";
 import { TestCoverage } from "../test-coverage";
 import { TestRegistry } from "../test-registry";
@@ -13,7 +13,7 @@ type CliApplicationContract = {
 class CliApplication implements CliApplicationContract {
   readonly #command: CommandContract;
 
-  constructor(args: string[], config: TE2EAutogenConfig) {
+  constructor(args: string[], config: TE2EAutogenConfig | null) {
     this.#command = new Command(args, config);
   }
 
@@ -34,6 +34,9 @@ class CliApplication implements CliApplicationContract {
         .with({ type: "SUB_COMMAND", subCommand: "UPDATE" }, async () => {
           await this.#logResults();
         })
+        .with({ type: "SUB_COMMAND", subCommand: "INIT" }, async () => {
+          await this.#initConfig();
+        })
         .exhaustive();
     } catch (error) {
       console.error(error);
@@ -52,6 +55,7 @@ class CliApplication implements CliApplicationContract {
   e2e-autogen [명령어] [옵션]
 
 🚀 명령어:
+  init        e2e-autogen.config.ts 설정 파일 생성
   generate    Google Sheets에서 스텁 코드 생성
   update      테스트 결과를 Google Sheets에 업데이트
 
@@ -62,26 +66,10 @@ class CliApplication implements CliApplicationContract {
 📋 설정 파일:
   프로젝트 루트에 'e2e-autogen.config.ts' 파일이 필요합니다.
 
-  예시 설정:
-  export default {
-    sheetsUrl: "https://docs.google.com/spreadsheets/d/...",
-    framework: "playwright", // 또는 "detox"
-    stubOutputFolder: "./tests/e2e",
-    jsonReporterFile: "./test-results.json",
-    credentialsFile: "./credentials.json",
-    googleSheetColumns: {
-      scenarioId: "A",
-      scenarioDescription: "B", 
-      uiPath: "C",
-      when: "D",
-      then: "E",
-      testId: "F",
-      tag: "G",
-      comment: "H"
-    }
-  };
-
 💡 사용 예시:
+  # 설정 파일 생성
+  e2e-autogen init
+
   # 스텁 코드 생성
   e2e-autogen generate
 
@@ -132,6 +120,11 @@ class CliApplication implements CliApplicationContract {
 
     const testCoverage = new TestCoverage(resultsPerSuite);
     await testCoverage.update(googleSpreadsheets);
+  }
+
+  async #initConfig() {
+    const configInitializer = new ConfigInitializer();
+    await configInitializer.initialize();
   }
 }
 

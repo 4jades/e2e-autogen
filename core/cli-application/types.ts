@@ -1,7 +1,7 @@
 import type { TE2EAutogenConfig } from "../../config";
 
 export type TFlag = "HELP" | "VERSION";
-export type TSubCommand = "GENERATE" | "UPDATE";
+export type TSubCommand = "GENERATE" | "UPDATE" | "INIT";
 
 export type TGenerateOptions = Pick<
   TE2EAutogenConfig,

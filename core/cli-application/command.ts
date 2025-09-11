@@ -13,13 +13,14 @@ type CommandContract = {
   subCommand: TSubCommand;
   optionsOf(subCommand: "GENERATE"): TGenerateOptions;
   optionsOf(subCommand: "UPDATE"): TUpdateOptions;
+  optionsOf(subCommand: "INIT"): void;
 };
 
 class Command implements CommandContract {
   readonly #args: string[];
-  readonly #config: TE2EAutogenConfig;
+  readonly #config: TE2EAutogenConfig | null;
 
-  constructor(args: string[], config: TE2EAutogenConfig) {
+  constructor(args: string[], config: TE2EAutogenConfig | null) {
     this.#args = args;
     this.#config = config;
   }
@@ -35,7 +36,8 @@ class Command implements CommandContract {
         () => "FLAG" as const
       )
       .when(
-        (args) => args[0] === "generate" || args[0] === "update",
+        (args) =>
+          args[0] === "generate" || args[0] === "update" || args[0] === "init",
         () => "SUB_COMMAND" as const
       )
       .otherwise(() => {
@@ -62,29 +64,45 @@ class Command implements CommandContract {
     return match(this.#args[0])
       .with("generate", () => "GENERATE" as const)
       .with("update", () => "UPDATE" as const)
+      .with("init", () => "INIT" as const)
       .otherwise(() => {
         throw new Error(
-          "서브커맨드가 필요합니다. 'generate' 또는 'update'를 지정해주세요."
+          "서브커맨드가 필요합니다. 'generate', 'update', 또는 'init'를 지정해주세요."
         );
       });
   }
 
   optionsOf(subCommand: "GENERATE"): TGenerateOptions;
   optionsOf(subCommand: "UPDATE"): TUpdateOptions;
-  optionsOf(subCommand: TSubCommand): TGenerateOptions | TUpdateOptions {
+  optionsOf(subCommand: "INIT"): void;
+  optionsOf(
+    subCommand: TSubCommand
+  ): TGenerateOptions | TUpdateOptions | undefined {
+    if (!this.#config && subCommand !== "INIT") {
+      throw new Error(
+        "설정 파일이 필요합니다. 'e2e-autogen init'으로 설정 파일을 생성하세요."
+      );
+    }
+
+    if (subCommand === "INIT") {
+      return undefined;
+    }
+
+    const config = this.#config as TE2EAutogenConfig;
+
     return match(subCommand)
       .with("GENERATE", () => ({
-        sheetsUrl: this.#config.sheetsUrl,
-        credentialsFile: this.#config.credentialsFile,
-        stubOutputFolder: this.#config.stubOutputFolder,
-        framework: this.#config.framework,
-        googleSheetColumns: this.#config.googleSheetColumns,
+        sheetsUrl: config.sheetsUrl,
+        credentialsFile: config.credentialsFile,
+        stubOutputFolder: config.stubOutputFolder,
+        framework: config.framework,
+        googleSheetColumns: config.googleSheetColumns,
       }))
       .with("UPDATE", () => ({
-        sheetsUrl: this.#config.sheetsUrl,
-        credentialsFile: this.#config.credentialsFile,
-        jsonReporterFile: this.#config.jsonReporterFile,
-        googleSheetColumns: this.#config.googleSheetColumns,
+        sheetsUrl: config.sheetsUrl,
+        credentialsFile: config.credentialsFile,
+        jsonReporterFile: config.jsonReporterFile,
+        googleSheetColumns: config.googleSheetColumns,
       }))
       .exhaustive();
   }
@@ -110,4 +128,9 @@ type TCommand =
       type: "SUB_COMMAND";
       subCommand: "UPDATE";
       options: TUpdateOptions;
+    }
+  | {
+      type: "SUB_COMMAND";
+      subCommand: "INIT";
+      options: undefined;
     };
