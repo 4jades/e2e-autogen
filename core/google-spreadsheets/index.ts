@@ -1,4 +1,4 @@
-import { google, type sheets_v4 } from "googleapis";
+import { auth, sheets_v4 } from "@googleapis/sheets";
 import type { TGoogleSheetColumns } from "../../config";
 import { CoverageSheet, type CoverageSheetContract } from "./coverage-sheet";
 import {
@@ -16,16 +16,14 @@ async function authorizedGoogleSpreadsheets(
   googleSheetColumns: TGoogleSheetColumns
 ) {
   try {
-    const auth = new google.auth.GoogleAuth({
+    const authClient = new auth.GoogleAuth({
       keyFile: credentialsFile,
       scopes: ["https://www.googleapis.com/auth/spreadsheets"],
     });
 
-    const authClient = await auth.getClient();
-    const v4sheets = google.sheets({
-      version: "v4",
+    const v4sheets = new sheets_v4.Sheets({
       auth: authClient,
-    } as any);
+    });
 
     return new GoogleSpreadsheets(sheetsUrl, v4sheets, googleSheetColumns);
   } catch (error) {
