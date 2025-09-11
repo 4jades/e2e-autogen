@@ -3,6 +3,7 @@ const commonjs = require("@rollup/plugin-commonjs");
 const typescript = require("@rollup/plugin-typescript");
 const json = require("@rollup/plugin-json");
 const dts = require("rollup-plugin-dts").default;
+const copy = require("rollup-plugin-copy");
 const glob = require("fast-glob");
 
 module.exports = [
@@ -54,6 +55,9 @@ module.exports = [
     inlineDynamicImports: true,
     plugins: [
       json(),
+      copy({
+        targets: [{ src: "package.json", dest: "dist" }],
+      }),
       typescript({ tsconfig: "./tsconfig.json", declaration: false }),
       resolve({ preferBuiltins: true, extensions: [".js", ".ts", ".json"] }),
       commonjs(),

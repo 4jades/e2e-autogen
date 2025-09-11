@@ -58,13 +58,28 @@ e2e-autogen --version
 e2e-autogen --help
 ```
 
-### 2) 설정 파일 생성: `e2e-autogen.config.ts`
+### 2) 설정 파일 생성
+
+대화형 설정으로 `e2e-autogen.config.ts` 파일을 자동 생성할 수 있습니다:
+
+```bash
+yarn e2e-autogen init
+```
+
+이 명령어를 실행하면 다음과 같은 질문들이 나타납니다:
+- 📊 Google Sheets URL
+- 🧪 테스트 프레임워크 (Playwright/Detox)
+- 📁 스텁 파일 출력 폴더
+- 📄 테스트 결과 JSON 파일 경로
+- 🔐 Google API 인증 파일 경로
+
+또는 수동으로 `e2e-autogen.config.ts` 파일을 생성할 수도 있습니다:
 
 
 ```typescript
 import { defineConfig } from '@dhlab/e2e-autogen';
 
-export default {
+export default defineConfig({
   // Google Sheets URL (required)
   sheetsUrl: "https://docs.google.com/spreadsheets/d/...",
 
@@ -91,7 +106,7 @@ export default {
     tag: "G",
     comment: "H",
   },
-};
+});
 ```
 
 ### 3) 스텁 생성

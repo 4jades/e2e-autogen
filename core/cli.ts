@@ -1,16 +1,17 @@
 #!/usr/bin/env node
 
-import { loadUserConfig } from "../config";
 import { CliApplication } from "./cli-application";
 
 const main = async () => {
   const args = process.argv.slice(2);
-  const config = await loadUserConfig();
+  const cli = new CliApplication();
 
-  const app = new CliApplication(args, config);
-  app.run();
+  await cli.run(args);
 };
 
 if (require.main === module) {
-  main();
+  main().catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
 }
