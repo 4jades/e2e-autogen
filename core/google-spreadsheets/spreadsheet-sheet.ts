@@ -1,4 +1,4 @@
-import type { sheets_v4 } from "googleapis";
+import type { sheets_v4 } from "@googleapis/sheets";
 
 type SpreadsheetSheetContract = {
   gid: string;
