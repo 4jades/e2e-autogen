@@ -1,22 +1,23 @@
-import { writeFileSync, existsSync } from "node:fs";
+import { existsSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-type ConfigInitializerContract = {
-  initialize(): Promise<void>;
-};
+import { BaseCommand } from "./base-command";
 
-class ConfigInitializer implements ConfigInitializerContract {
+/**
+ * e2e-autogen.config.ts 설정 파일을 생성하는 명령어를 수행한다.
+ */
+class InitCommand extends BaseCommand {
   readonly #configPath: string;
 
   constructor(configPath: string = "e2e-autogen.config.ts") {
+    super();
     this.#configPath = resolve(configPath);
   }
 
-  async initialize(): Promise<void> {
+  async execute(): Promise<void> {
     if (this.#fileExists()) {
       throw new Error(`설정 파일이 이미 존재합니다: ${this.#configPath}`);
     }
-
     await this.#createConfigFile();
     this.#showSuccessMessage();
   }
@@ -67,4 +68,4 @@ export default defineConfig({
   }
 }
 
-export { ConfigInitializer };
+export { InitCommand };

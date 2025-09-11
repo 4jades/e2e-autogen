@@ -13,7 +13,11 @@ class UserConfig {
 
   async load(): Promise<TE2EAutogenConfig> {
     if (!this.#fileExists()) {
-      throw new Error(`Config file not found: ${this.#configPath}`);
+      throw new Error(
+        `config 파일이 존재하지 않습니다. init 명령어로 생성하세요: ${
+          this.#configPath
+        }`
+      );
     }
 
     return this.#loadConfig();
