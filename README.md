@@ -1,7 +1,5 @@
 # 🤖 E2E Autogen
 
-> ⚠️ DEPRECATED: 이 패키지는 더 이상 사용되지 않습니다. 이제부터는 [@jjades/e2e-autogen](https://www.npmjs.com/package/@jjades/e2e-autogen)에서 관리됩니다.
-
 Google Spreadsheet를 **단일 소스**로 삼아, **E2E 테스트의 작성–실행–리포팅**까지 자동화하여 QA·개발 리소스를 줄이는 도구입니다.
 
 - 한 번의 TC 정의 → 테스트 스텁 자동 생성 → 실행 결과 자동 업데이트  
